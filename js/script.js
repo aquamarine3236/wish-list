@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadAndDisplayGiftsInTable() {
   try {
     // Show loading state
-    tableLoadingState.style.display = "block";
+    tableLoadingState.style.display = "flex";
     giftsTableBody.innerHTML = "";
     tableEmptyState.style.display = "none";
     tableWrapper.style.display = "none";
@@ -305,12 +305,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (reloadBtn) {
     reloadBtn.addEventListener("click", async () => {
       reloadBtn.disabled = true;
-      reloadBtn.textContent = "Đang tải...";
       tableDataLoaded = false;
       await loadAndDisplayGiftsInTable();
       tableDataLoaded = true;
       reloadBtn.disabled = false;
-      reloadBtn.textContent = "Tải lại";
     });
   }
 });
@@ -419,7 +417,7 @@ function showToast(message, type = "success") {
 // CONFIRMATION DIALOG
 // ==========================================
 
-function showConfirmDialog(message) {
+function showConfirmDialog(message, confirmLabel = "Xóa", confirmClass = "") {
   return new Promise((resolve) => {
     // Create overlay
     const overlay = document.createElement("div");
@@ -433,7 +431,7 @@ function showConfirmDialog(message) {
       <p class="modal-message">${message}</p>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-cancel" type="button">Hủy</button>
-        <button class="modal-btn modal-btn-confirm" type="button">Xóa</button>
+        <button class="modal-btn modal-btn-confirm ${confirmClass}" type="button">${confirmLabel}</button>
       </div>
     `;
 
@@ -462,8 +460,35 @@ function showConfirmDialog(message) {
 }
 
 // ==========================================
-// UTILITY FUNCTIONS - URL HANDLING
+// ALERT DIALOG (single button, same style as ConfirmDialog)
 // ==========================================
+
+function showAlertDialog(message, title = "Thông báo", btnLabel = "Đóng", btnClass = "") {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    const content = document.createElement("div");
+    content.className = "modal-content";
+    content.innerHTML = `
+      <h2 class="modal-title">${title}</h2>
+      <p class="modal-message">${message}</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-confirm ${btnClass}" type="button">${btnLabel}</button>
+      </div>
+    `;
+
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    const closeDialog = () => { overlay.remove(); resolve(); };
+
+    content.querySelector(".modal-btn-confirm").addEventListener("click", closeDialog);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeDialog(); });
+  });
+}
+
+
 
 function normalizeUrl(url) {
   if (!url) return "#";
@@ -527,6 +552,14 @@ async function handleFormSubmit(e) {
     return;
   }
 
+  // Ask for confirmation before saving
+  const confirmed = await showConfirmDialog(
+    `Bạn có muốn lưu "<strong>${ten}</strong>" vào danh sách không?`,
+    "Lưu",
+    "save"
+  );
+  if (!confirmed) return;
+
   // Show loading state on button
   const submitBtn = giftForm.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;
@@ -552,10 +585,15 @@ async function handleFormSubmit(e) {
     const result = await response.json();
 
     if (result.status === "success" || result.success) {
-      showFormBanner("Đã lưu món quà thành công!", "success");
-
-      // Reset form
+      // Reset form first so fields are clear when dialog closes
       giftForm.reset();
+
+      await showAlertDialog(
+        `Món quà "<strong>${ten}</strong>" đã được lưu thành công!`,
+        "Thành công",
+        "Đóng",
+        "save"
+      );
 
       // Reload table if it was loaded
       if (tableDataLoaded) {
