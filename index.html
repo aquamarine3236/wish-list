@@ -52,6 +52,21 @@
                       <textarea class="form-control" id="ghichu" name="ghichu" placeholder="Thêm ghi chú..." rows="2"></textarea>
                     </div>
 
+                    <div class="form-group">
+                      <label class="form-label">Độ mong muốn <span class="required">*</span></label>
+                      <div class="star-picker-wrapper" id="starPickerWrapper">
+                        <div class="star-picker" id="starPicker">
+                          <button type="button" class="star-btn" data-value="1">★</button>
+                          <button type="button" class="star-btn" data-value="2">★</button>
+                          <button type="button" class="star-btn" data-value="3">★</button>
+                          <button type="button" class="star-btn" data-value="4">★</button>
+                          <button type="button" class="star-btn" data-value="5">★</button>
+                        </div>
+                      </div>
+                      <span class="star-required-msg" id="starRequiredMsg">Vui lòng chọn độ mong muốn</span>
+                      <input type="hidden" id="doMongMuon" name="doMongMuon" value="">
+                    </div>
+
                     <div class="form-actions">
                       <button type="submit" class="btn btn-primary">Lưu</button>
                     </div>
@@ -92,6 +107,7 @@
                     <tr>
                       <th>Tên</th>
                       <th>Link</th>
+                      <th>Độ mong muốn</th>
                       <th>Ghi chú</th>
                       <th></th>
                     </tr>
@@ -133,6 +149,19 @@
             <div class="mb-3">
               <label for="editGhichu" class="form-label">Ghi chú</label>
               <textarea class="form-control" id="editGhichu" rows="3" placeholder="Thêm ghi chú..."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Độ mong muốn</label>
+              <div class="star-picker-wrapper" id="editStarPickerWrapper">
+                <div class="star-picker" id="editStarPicker">
+                  <button type="button" class="star-btn" data-value="1">★</button>
+                  <button type="button" class="star-btn" data-value="2">★</button>
+                  <button type="button" class="star-btn" data-value="3">★</button>
+                  <button type="button" class="star-btn" data-value="4">★</button>
+                  <button type="button" class="star-btn" data-value="5">★</button>
+                </div>
+              </div>
+              <input type="hidden" id="editDoMongMuon" value="">
             </div>
           </form>
         </div>

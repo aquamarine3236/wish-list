@@ -29,6 +29,56 @@ const giftTabs = document.getElementById("giftTabs");
 let tableDataLoaded = false;
 
 // ==========================================
+// STAR PICKER
+// ==========================================
+
+const STAR_LABELS = ["", "★", "★★", "★★★", "★★★★", "★★★★★"];
+
+function setStarPicker(pickerId, inputId, value) {
+  const picker = document.getElementById(pickerId);
+  if (!picker) return;
+  picker.querySelectorAll(".star-btn").forEach(btn => {
+    btn.classList.toggle("active", parseInt(btn.dataset.value) <= value);
+  });
+  document.getElementById(inputId).value = value || "";
+
+  // Update count label
+  const wrapper = picker.closest(".star-picker-wrapper");
+  if (wrapper) {
+    const label = wrapper.querySelector(".star-count-label");
+    if (label) {
+      label.textContent = value ? STAR_LABELS[value] : "";
+      label.classList.toggle("visible", value > 0);
+    }
+    if (value > 0) {
+      wrapper.classList.remove("error");
+      const errMsg = wrapper.parentElement?.querySelector(".star-required-msg");
+      if (errMsg) errMsg.classList.remove("visible");
+    }
+  }
+}
+
+function initStarPicker(pickerId, inputId) {
+  const picker = document.getElementById(pickerId);
+  if (!picker) return;
+  const btns = picker.querySelectorAll(".star-btn");
+
+  btns.forEach(btn => {
+    btn.addEventListener("mouseenter", () => {
+      const hov = parseInt(btn.dataset.value);
+      btns.forEach(b => b.classList.toggle("active", parseInt(b.dataset.value) <= hov));
+    });
+    btn.addEventListener("mouseleave", () => {
+      const sel = parseInt(document.getElementById(inputId).value) || 0;
+      btns.forEach(b => b.classList.toggle("active", parseInt(b.dataset.value) <= sel));
+    });
+    btn.addEventListener("click", () => {
+      setStarPicker(pickerId, inputId, parseInt(btn.dataset.value));
+    });
+  });
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 
@@ -46,6 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Close any open action menus when clicking outside
   document.addEventListener("click", closeAllActionMenus);
+
+  // Init star pickers
+  initStarPicker("starPicker", "doMongMuon");
+  initStarPicker("editStarPicker", "editDoMongMuon");
 });
 
 // ==========================================
@@ -123,6 +177,7 @@ async function fetchGiftsFromSheet() {
         ten: item.ten || item["Tên"] || "",
         link: item.link || item["Link"] || "",
         ghichu: item.ghichu || item["Ghi chú"] || "",
+        doMongMuon: item.doMongMuon || item["Độ mong muốn"] || item["do_mong_muon"] || "",
         status: item.status || item["Status"] || ""
       }));
     }
@@ -193,6 +248,25 @@ function createTableRow(gift, index) {
     linkCell.appendChild(valueSpan("—"));
   }
 
+  // Stars Cell
+  const starsCell = document.createElement("td");
+  starsCell.className = "cell-stars";
+  starsCell.dataset.label = "Mong muốn";
+  const level = parseInt(gift.doMongMuon) || 0;
+  if (level > 0) {
+    const starsDiv = document.createElement("div");
+    starsDiv.className = "cell-stars-display";
+    for (let i = 0; i < level; i++) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.textContent = "★";
+      starsDiv.appendChild(star);
+    }
+    starsCell.appendChild(valueSpan(starsDiv));
+  } else {
+    starsCell.appendChild(valueSpan("—"));
+  }
+
   // Note Cell
   const noteCell = document.createElement("td");
   noteCell.className = "cell-note";
@@ -208,6 +282,7 @@ function createTableRow(gift, index) {
 
   row.appendChild(nameCell);
   row.appendChild(linkCell);
+  row.appendChild(starsCell);
   row.appendChild(noteCell);
   row.appendChild(actionsCell);
 
@@ -287,6 +362,11 @@ function openEditModal(gift) {
   document.getElementById("editLink").value = gift.link || "";
   document.getElementById("editGhichu").value = gift.ghichu || "";
 
+  // Populate star picker
+  const level = parseInt(gift.doMongMuon) || 0;
+  document.getElementById("editDoMongMuon").value = level || "";
+  setStarPicker("editStarPicker", "editDoMongMuon", level);
+
   // Store current gift data for saving
   window.currentEditingGift = gift;
 
@@ -315,6 +395,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("saveEditBtn").addEventListener("click", async () => {
     const newLink = document.getElementById("editLink").value.trim();
     const newNote = document.getElementById("editGhichu").value.trim();
+    const newDoMongMuon = document.getElementById("editDoMongMuon").value;
     const giftName = window.currentEditingGift?.ten || "";
 
     // Close modal first, then show confirm dialog
@@ -329,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!confirmed) return;
 
     showTableLoading();
-    await saveRowEdit(window.currentEditingGift, newLink, newNote);
+    await saveRowEdit(window.currentEditingGift, newLink, newNote, newDoMongMuon);
   });
 
   // Handle reload button
@@ -345,13 +426,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-async function saveRowEdit(gift, newLink, newNote) {
+async function saveRowEdit(gift, newLink, newNote, newDoMongMuon) {
   try {
     const data = {
       action: "update",
       ten: gift.ten,
       link: newLink,
       ghichu: newNote,
+      doMongMuon: newDoMongMuon || "",
       status: ACTIVE_STATUS
     };
 
@@ -579,10 +661,19 @@ async function handleFormSubmit(e) {
   const ten = document.getElementById("ten").value.trim();
   const link = document.getElementById("link").value.trim();
   const ghichu = document.getElementById("ghichu").value.trim();
+  const doMongMuon = document.getElementById("doMongMuon").value;
 
   // Validate
   if (!ten) {
     showFormBanner("Vui lòng nhập tên món quà", "error");
+    return;
+  }
+
+  if (!doMongMuon) {
+    const wrapper = document.getElementById("starPickerWrapper");
+    wrapper?.classList.add("error");
+    const errMsg = document.getElementById("starRequiredMsg");
+    if (errMsg) errMsg.classList.add("visible");
     return;
   }
 
@@ -607,7 +698,8 @@ async function handleFormSubmit(e) {
       ten: ten,
       link: link,
       ghichu: ghichu,
-      status: ACTIVE_STATUS // Auto-set to "Trong giỏ hàng"
+      doMongMuon: doMongMuon || "",
+      status: ACTIVE_STATUS
     };
 
     // Send to Google Sheets
@@ -621,6 +713,7 @@ async function handleFormSubmit(e) {
     if (result.status === "success" || result.success) {
       // Reset form first so fields are clear when dialog closes
       giftForm.reset();
+      setStarPicker("starPicker", "doMongMuon", 0);
 
       await showAlertDialog(
         `Món quà "<strong>${ten}</strong>" đã được lưu thành công!`,
@@ -651,5 +744,3 @@ async function handleFormSubmit(e) {
 // ========================================== 
 
 console.log("Wishlist app script loaded successfully");
-
-
