@@ -3,7 +3,7 @@
    ========================================== */
 
 // Google Apps Script endpoint
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUeZ61uU0MbhsW45tEuMYD39pitDrVx-KbzxzzVCbihy2nfxpioI-eDkKbEf0CDlAv/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbweDQXLC63qo6AUjTGJT6U2Xa-vEkQcR-qLTXeodq1id1U5if-Xg3OVRvX4V_suvMU/exec";
 
 // Status constant
 const ACTIVE_STATUS = "Trong giỏ hàng";
@@ -52,6 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // LOAD AND DISPLAY GIFTS IN TABLE
 // ==========================================
 
+function showTableLoading() {
+  tableLoadingState.style.display = "flex";
+  tableWrapper.style.display = "none";
+  tableEmptyState.style.display = "none";
+  giftsTableBody.innerHTML = "";
+}
+
 async function loadAndDisplayGiftsInTable() {
   try {
     // Show loading state
@@ -96,7 +103,7 @@ async function fetchGiftsFromSheet() {
   try {
     console.log("Fetching gifts from:", SCRIPT_URL + "?action=read");
 
-    const response = await fetch(SCRIPT_URL + "?action=read");
+    const response = await fetch(SCRIPT_URL + "?action=read&t=" + Date.now());
 
     console.log("Response status:", response.status);
 
@@ -308,12 +315,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("saveEditBtn").addEventListener("click", async () => {
     const newLink = document.getElementById("editLink").value.trim();
     const newNote = document.getElementById("editGhichu").value.trim();
+    const giftName = window.currentEditingGift?.ten || "";
 
-    await saveRowEdit(window.currentEditingGift, newLink, newNote);
-
-    // Close modal
+    // Close modal first, then show confirm dialog
     const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
     editModal.hide();
+
+    const confirmed = await showConfirmDialog(
+      `Bạn có chắc chắn muốn lưu thay đổi cho "<strong>${giftName}</strong>"?`,
+      "Lưu thay đổi",
+      "save"
+    );
+    if (!confirmed) return;
+
+    showTableLoading();
+    await saveRowEdit(window.currentEditingGift, newLink, newNote);
   });
 
   // Handle reload button
@@ -368,6 +384,8 @@ async function deleteRow(gift) {
   );
 
   if (!confirmed) return;
+
+  showTableLoading();
 
   try {
     const data = {
@@ -633,3 +651,5 @@ async function handleFormSubmit(e) {
 // ========================================== 
 
 console.log("Wishlist app script loaded successfully");
+
+
