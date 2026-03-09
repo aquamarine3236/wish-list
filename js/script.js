@@ -17,28 +17,48 @@ const giftsGrid = document.getElementById("giftsGrid");
 const loadingState = document.getElementById("loadingState");
 const emptyState = document.getElementById("emptyState");
 
+// Table DOM elements
+const giftsTableBody = document.getElementById("giftsTableBody");
+const tableLoadingState = document.getElementById("tableLoadingState");
+const tableEmptyState = document.getElementById("tableEmptyState");
+const tableWrapper = document.getElementById("tableWrapper");
+const tableTab = document.getElementById("table-tab");
+
+// Tab elements
+const giftTabs = document.getElementById("giftTabs");
+let tableDataLoaded = false;
+
 // ==========================================
 // INITIALIZATION
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Load gifts on page startup
-  loadAndDisplayGifts();
-
   // Handle form submission
   giftForm.addEventListener("submit", handleFormSubmit);
+
+  // Handle tab switching
+  tableTab.addEventListener("shown.bs.tab", (e) => {
+    if (!tableDataLoaded) {
+      loadAndDisplayGiftsInTable();
+      tableDataLoaded = true;
+    }
+  });
+
+  // Close any open action menus when clicking outside
+  document.addEventListener("click", closeAllActionMenus);
 });
 
 // ==========================================
-// LOAD AND DISPLAY GIFTS
+// LOAD AND DISPLAY GIFTS IN TABLE
 // ==========================================
 
-async function loadAndDisplayGifts() {
+async function loadAndDisplayGiftsInTable() {
   try {
     // Show loading state
-    loadingState.style.display = "block";
-    giftsGrid.innerHTML = "";
-    emptyState.style.display = "none";
+    tableLoadingState.style.display = "block";
+    giftsTableBody.innerHTML = "";
+    tableEmptyState.style.display = "none";
+    tableWrapper.style.display = "none";
 
     // Fetch data from Google Sheets
     const gifts = await fetchGiftsFromSheet();
@@ -47,137 +67,398 @@ async function loadAndDisplayGifts() {
     const activeGifts = gifts.filter(gift => gift.status === ACTIVE_STATUS);
 
     // Hide loading state
-    loadingState.style.display = "none";
+    tableLoadingState.style.display = "none";
 
     // Display gifts or empty state
     if (activeGifts.length === 0) {
-      emptyState.style.display = "block";
+      tableEmptyState.style.display = "block";
     } else {
-      displayGifts(activeGifts);
+      displayGiftsInTable(activeGifts);
+      tableWrapper.style.display = "block";
     }
   } catch (error) {
     console.error("Error loading gifts:", error);
-    loadingState.style.display = "none";
-    emptyState.style.display = "block";
+    tableLoadingState.style.display = "none";
+    tableEmptyState.style.display = "block";
     // Show helpful message for network issues
     const msg = error.message.includes("fetch") 
       ? "Không thể kết nối. Kiểm tra lại Google Apps Script đã được triển khai chưa?"
       : "Có lỗi khi tải danh sách. Vui lòng làm mới trang.";
-    emptyState.querySelector(".empty-message").textContent = msg;
+    tableEmptyState.querySelector(".empty-message").textContent = msg;
   }
 }
 
-// // ==========================================
-// // FETCH GIFTS FROM GOOGLE SHEETS
-// // ==========================================
-
-// async function fetchGiftsFromSheet() {
-//   try {
-//     console.log("Fetching gifts from:", SCRIPT_URL + "?action=read");
-
-//     // Thử fetch đơn giản hơn
-//     const response = await fetch(SCRIPT_URL + "?action=read");
-
-//     console.log("Response status:", response.status);
-//     console.log("Response headers:", response.headers);
-
-//     if (!response.ok) {
-//       const errorText = await response.text();
-//       console.error("Response error:", errorText);
-//       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-//     }
-
-//     const result = await response.json();
-//     console.log("Fetched data:", result);
-
-//     // Transform server response to match our expected format
-//     // Expected format: array of objects with { ten, link, ghichu, status }
-//     if (result.data && Array.isArray(result.data)) {
-//       return result.data.map(item => ({
-//         ten: item.ten || item["Tên"] || "",
-//         link: item.link || item["Link"] || "",
-//         ghichu: item.ghichu || item["Ghi chú"] || "",
-//         status: item.status || item["Status"] || ""
-//       }));
-//     }
-
-//     console.warn("Expected data format not found in response");
-//     return [];
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     console.log("Hint: Make sure Google Apps Script is deployed with 'Execute as: Me' and 'Who has access: Anyone'");
-//     return [];
-//   }
-// }
-
-// // ==========================================
-// // DISPLAY GIFTS IN GRID
-// // ==========================================
-
-// function displayGifts(gifts) {
-//   giftsGrid.innerHTML = "";
-
-//   gifts.forEach((gift, index) => {
-//     const giftCard = createGiftCard(gift, index);
-//     giftsGrid.appendChild(giftCard);
-//   });
-// }
-
 // ==========================================
-// CREATE GIFT CARD ELEMENT
+// FETCH GIFTS FROM GOOGLE SHEETS
 // ==========================================
 
-function createGiftCard(gift, index) {
-  const col = document.createElement("div");
-  col.className = "col-12 col-sm-6 col-lg-4";
-  col.style.animationDelay = `${index * 0.1}s`;
+async function fetchGiftsFromSheet() {
+  try {
+    console.log("Fetching gifts from:", SCRIPT_URL + "?action=read");
 
-  const card = document.createElement("div");
-  card.className = "gift-card";
+    const response = await fetch(SCRIPT_URL + "?action=read");
 
-  // Gift name
-  const nameEl = document.createElement("h3");
-  nameEl.className = "gift-name";
-  nameEl.textContent = gift.ten || "Không có tên";
+    console.log("Response status:", response.status);
 
-  // Gift notes
-  let notesEl = "";
-  if (gift.ghichu && gift.ghichu.trim()) {
-    const notes = document.createElement("p");
-    notes.className = "gift-description";
-    notes.textContent = gift.ghichu;
-    notesEl = notes;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Response error:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("Fetched data:", result);
+
+    // Transform server response to match our expected format
+    // Expected format: array of objects with { ten, link, ghichu, status }
+    if (result.data && Array.isArray(result.data)) {
+      return result.data.map(item => ({
+        ten: item.ten || item["Tên"] || "",
+        link: item.link || item["Link"] || "",
+        ghichu: item.ghichu || item["Ghi chú"] || "",
+        status: item.status || item["Status"] || ""
+      }));
+    }
+
+    console.warn("Expected data format not found in response");
+    return [];
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    console.log("Hint: Make sure Google Apps Script is deployed with 'Execute as: Me' and 'Who has access: Anyone'");
+    throw error;
   }
+}
 
-  // Gift link
-  let linkEl = "";
+// ==========================================
+// DISPLAY GIFTS IN TABLE
+// ==========================================
+
+function displayGiftsInTable(gifts) {
+  // Remove any previously appended action menus from body
+  document.querySelectorAll("body > .action-menu").forEach(m => m.remove());
+  giftsTableBody.innerHTML = "";
+
+  gifts.forEach((gift, index) => {
+    const row = createTableRow(gift, index);
+    giftsTableBody.appendChild(row);
+  });
+}
+
+// ==========================================
+// CREATE TABLE ROW
+// ==========================================
+
+function createTableRow(gift, index) {
+  const row = document.createElement("tr");
+  row.dataset.giftName = gift.ten;
+
+  // Name Cell
+  const nameCell = document.createElement("td");
+  nameCell.className = "cell-name";
+  nameCell.textContent = gift.ten || "Không có tên";
+
+  // Link Cell
+  const linkCell = document.createElement("td");
+  linkCell.className = "cell-link";
   if (gift.link && gift.link.trim()) {
-    const linkContainer = document.createElement("div");
-    linkContainer.className = "gift-link";
-
-    const linkLabel = document.createElement("span");
-    linkLabel.className = "gift-link-label";
-    linkLabel.textContent = "Xem:";
-
     const link = document.createElement("a");
     link.href = normalizeUrl(gift.link);
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = truncateUrl(gift.link);
+    link.textContent = "Link";
     link.title = gift.link;
-
-    linkContainer.appendChild(linkLabel);
-    linkContainer.appendChild(link);
-    linkEl = linkContainer;
+    linkCell.appendChild(link);
+  } else {
+    linkCell.textContent = "—";
   }
 
-  // Assemble card
-  card.appendChild(nameEl);
-  if (notesEl) card.appendChild(notesEl);
-  if (linkEl) card.appendChild(linkEl);
+  // Note Cell
+  const noteCell = document.createElement("td");
+  noteCell.className = "cell-note";
+  noteCell.textContent = gift.ghichu || "—";
 
-  col.appendChild(card);
-  return col;
+  // Actions Cell
+  const actionsCell = document.createElement("td");
+  actionsCell.className = "cell-actions";
+  const actionMenu = createActionMenu(gift);
+  actionsCell.appendChild(actionMenu);
+
+  row.appendChild(nameCell);
+  row.appendChild(linkCell);
+  row.appendChild(noteCell);
+  row.appendChild(actionsCell);
+
+  return row;
+}
+
+// ==========================================
+// CREATE ACTION MENU
+// ==========================================
+
+function createActionMenu(gift) {
+  const container = document.createElement("div");
+  container.className = "action-menu-container";
+  container.style.position = "relative";
+
+  const btn = document.createElement("button");
+  btn.className = "action-menu-btn";
+  btn.innerHTML = "⋯";
+  btn.type = "button";
+
+  const menu = document.createElement("div");
+  menu.className = "action-menu";
+  // Attach menu to body so it escapes all overflow/clip containers
+  document.body.appendChild(menu);
+
+  // Edit Button
+  const editBtn = document.createElement("button");
+  editBtn.className = "action-menu-item";
+  editBtn.textContent = "Sửa";
+  editBtn.type = "button";
+  editBtn.addEventListener("click", () => {
+    closeAllActionMenus();
+    openEditModal(gift);
+  });
+
+  // Delete Button
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "action-menu-item delete";
+  deleteBtn.textContent = "Xóa";
+  deleteBtn.type = "button";
+  deleteBtn.addEventListener("click", () => {
+    closeAllActionMenus();
+    deleteRow(gift);
+  });
+
+  menu.appendChild(editBtn);
+  menu.appendChild(deleteBtn);
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeAllActionMenus();
+    // Position menu using fixed coords so it escapes any overflow container
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 6) + "px";
+    menu.style.left = (rect.right - 130) + "px";
+    menu.classList.add("show");
+  });
+
+  container.appendChild(btn);
+
+  return container;
+}
+
+function closeAllActionMenus() {
+  document.querySelectorAll(".action-menu").forEach(menu => {
+    menu.classList.remove("show");
+  });
+}
+
+// ==========================================
+// MODAL EDIT MODE
+// ==========================================
+
+function openEditModal(gift) {
+  // Populate modal with current data
+  document.getElementById("editTen").value = gift.ten;
+  document.getElementById("editLink").value = gift.link || "";
+  document.getElementById("editGhichu").value = gift.ghichu || "";
+
+  // Store current gift data for saving
+  window.currentEditingGift = gift;
+
+  // Show modal
+  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+  editModal.show();
+}
+
+// Initialize edit modal save button
+document.addEventListener("DOMContentLoaded", () => {
+  // Handle form submission
+  giftForm.addEventListener("submit", handleFormSubmit);
+
+  // Handle tab switching
+  tableTab.addEventListener("shown.bs.tab", (e) => {
+    if (!tableDataLoaded) {
+      loadAndDisplayGiftsInTable();
+      tableDataLoaded = true;
+    }
+  });
+
+  // Close any open action menus when clicking outside
+  document.addEventListener("click", closeAllActionMenus);
+
+  // Handle edit modal save
+  document.getElementById("saveEditBtn").addEventListener("click", async () => {
+    const newLink = document.getElementById("editLink").value.trim();
+    const newNote = document.getElementById("editGhichu").value.trim();
+
+    await saveRowEdit(window.currentEditingGift, newLink, newNote);
+
+    // Close modal
+    const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+    editModal.hide();
+  });
+
+  // Handle reload button
+  const reloadBtn = document.getElementById("reloadTableBtn");
+  if (reloadBtn) {
+    reloadBtn.addEventListener("click", async () => {
+      reloadBtn.disabled = true;
+      reloadBtn.textContent = "Đang tải...";
+      tableDataLoaded = false;
+      await loadAndDisplayGiftsInTable();
+      tableDataLoaded = true;
+      reloadBtn.disabled = false;
+      reloadBtn.textContent = "Tải lại";
+    });
+  }
+});
+
+async function saveRowEdit(gift, newLink, newNote) {
+  try {
+    const data = {
+      action: "update",
+      ten: gift.ten,
+      link: newLink,
+      ghichu: newNote,
+      status: ACTIVE_STATUS
+    };
+
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success" || result.success) {
+      showToast("✓ Cập nhật thành công!", "success");
+      await loadAndDisplayGiftsInTable();
+    } else {
+      throw new Error(result.message || "Không thể cập nhật");
+    }
+  } catch (error) {
+    console.error("Error updating gift:", error);
+    showToast("✗ Lỗi: " + error.message, "error");
+  }
+}
+
+// ==========================================
+// DELETE ROW
+// ==========================================
+
+async function deleteRow(gift) {
+  const confirmed = await showConfirmDialog(
+    `Bạn có chắc chắn muốn xóa "${gift.ten}"?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const data = {
+      action: "delete",
+      ten: gift.ten
+    };
+
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success" || result.success) {
+      showToast("✓ Xóa thành công!", "success");
+      await loadAndDisplayGiftsInTable();
+    } else {
+      throw new Error(result.message || "Không thể xóa");
+    }
+  } catch (error) {
+    console.error("Error deleting gift:", error);
+    showToast("✗ Lỗi: " + error.message, "error");
+  }
+}
+
+// ==========================================
+// TOAST NOTIFICATIONS
+// ==========================================
+
+function showToast(message, type = "success") {
+  // Create container if not exists
+  let container = document.querySelector(".toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
+
+  // Create toast
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${type === "success" ? "✓" : "✕"}</span>
+    <span class="toast-message">${message}</span>
+    <button class="toast-close" type="button">×</button>
+  `;
+
+  container.appendChild(toast);
+
+  // Close button handler
+  toast.querySelector(".toast-close").addEventListener("click", () => {
+    toast.remove();
+  });
+
+  // Auto-dismiss after 3 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// ==========================================
+// CONFIRMATION DIALOG
+// ==========================================
+
+function showConfirmDialog(message) {
+  return new Promise((resolve) => {
+    // Create overlay
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    // Create content
+    const content = document.createElement("div");
+    content.className = "modal-content";
+    content.innerHTML = `
+      <h2 class="modal-title">Xác nhận</h2>
+      <p class="modal-message">${message}</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" type="button">Hủy</button>
+        <button class="modal-btn modal-btn-confirm" type="button">Xóa</button>
+      </div>
+    `;
+
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    // Event handlers
+    const confirmBtn = content.querySelector(".modal-btn-confirm");
+    const cancelBtn = content.querySelector(".modal-btn-cancel");
+
+    const closeDialog = (result) => {
+      overlay.remove();
+      resolve(result);
+    };
+
+    confirmBtn.addEventListener("click", () => closeDialog(true));
+    cancelBtn.addEventListener("click", () => closeDialog(false));
+
+    // Close on overlay click
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        closeDialog(false);
+      }
+    });
+  });
 }
 
 // ==========================================
@@ -204,6 +485,31 @@ function truncateUrl(url) {
 }
 
 // ==========================================
+// FORM STATUS BANNER
+// ==========================================
+
+function showFormBanner(message, type = "success") {
+  const banner = document.getElementById("formBanner");
+  const icon = document.getElementById("formBannerIcon");
+  const msg = document.getElementById("formBannerMessage");
+  const closeBtn = document.getElementById("formBannerClose");
+  if (!banner) return;
+
+  banner.className = "form-banner show " + type;
+  icon.textContent = type === "success" ? "✓" : "✕";
+  msg.textContent = message;
+
+  closeBtn.onclick = () => {
+    banner.className = "form-banner";
+  };
+
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    banner.className = "form-banner";
+  }, 5000);
+}
+
+// ==========================================
 // HANDLE FORM SUBMISSION
 // ==========================================
 
@@ -217,7 +523,7 @@ async function handleFormSubmit(e) {
 
   // Validate
   if (!ten) {
-    alert("Vui lòng nhập tên");
+    showFormBanner("Vui lòng nhập tên món quà", "error");
     return;
   }
 
@@ -246,20 +552,21 @@ async function handleFormSubmit(e) {
     const result = await response.json();
 
     if (result.status === "success" || result.success) {
-      // Success! Show message
-      alert("✓ Đã lưu món quà thành công!");
+      showFormBanner("Đã lưu món quà thành công!", "success");
 
       // Reset form
       giftForm.reset();
 
-      // Reload and display gifts
-      // await loadAndDisplayGifts();
+      // Reload table if it was loaded
+      if (tableDataLoaded) {
+        await loadAndDisplayGiftsInTable();
+      }
     } else {
       throw new Error(result.message || "Unknown error");
     }
   } catch (error) {
     console.error("Error submitting gift:", error);
-    alert("✗ Có lỗi khi lưu. Vui lòng thử lại.\n\nLỗi: " + error.message);
+    showFormBanner("Có lỗi khi lưu: " + error.message, "error");
   } finally {
     // Restore button
     submitBtn.disabled = false;
