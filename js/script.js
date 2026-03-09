@@ -152,14 +152,28 @@ function createTableRow(gift, index) {
   const row = document.createElement("tr");
   row.dataset.giftName = gift.ten;
 
+  // Helper to wrap value in a span for mobile flex layout
+  const valueSpan = (content) => {
+    const span = document.createElement("span");
+    span.className = "cell-value";
+    if (typeof content === "string") {
+      span.textContent = content;
+    } else {
+      span.appendChild(content);
+    }
+    return span;
+  };
+
   // Name Cell
   const nameCell = document.createElement("td");
   nameCell.className = "cell-name";
-  nameCell.textContent = gift.ten || "Không có tên";
+  nameCell.dataset.label = "Tên";
+  nameCell.appendChild(valueSpan(gift.ten || "Không có tên"));
 
   // Link Cell
   const linkCell = document.createElement("td");
   linkCell.className = "cell-link";
+  linkCell.dataset.label = "Link";
   if (gift.link && gift.link.trim()) {
     const link = document.createElement("a");
     link.href = normalizeUrl(gift.link);
@@ -167,21 +181,23 @@ function createTableRow(gift, index) {
     link.rel = "noopener noreferrer";
     link.textContent = "Link";
     link.title = gift.link;
-    linkCell.appendChild(link);
+    linkCell.appendChild(valueSpan(link));
   } else {
-    linkCell.textContent = "—";
+    linkCell.appendChild(valueSpan("—"));
   }
 
   // Note Cell
   const noteCell = document.createElement("td");
   noteCell.className = "cell-note";
-  noteCell.textContent = gift.ghichu || "—";
+  noteCell.dataset.label = "Ghi chú";
+  noteCell.appendChild(valueSpan(gift.ghichu || "—"));
 
   // Actions Cell
   const actionsCell = document.createElement("td");
   actionsCell.className = "cell-actions";
+  actionsCell.dataset.label = "";
   const actionMenu = createActionMenu(gift);
-  actionsCell.appendChild(actionMenu);
+  actionsCell.appendChild(valueSpan(actionMenu));
 
   row.appendChild(nameCell);
   row.appendChild(linkCell);
