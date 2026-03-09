@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wish List</title>
+
+  <link rel="icon" type="image/png" href="images/logo.png">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Add Gift Form Section -->
+      <section class="form-section">
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <div class="form-card">
+              <h2 class="form-title">Thêm món quà mới</h2>
+              <form id="giftForm" class="gift-form">
+                <div class="form-group">
+                  <label for="ten" class="form-label">Tên món quà <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="ten" name="ten" placeholder="Nhập tên món quà" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="link" class="form-label">Link tham khảo</label>
+                  <input type="url" class="form-control" id="link" name="link" placeholder="https://example.com">
+                </div>
+
+                <div class="form-group">
+                  <label for="ghichu" class="form-label">Ghi chú</label>
+                  <textarea class="form-control" id="ghichu" name="ghichu" placeholder="Thêm ghi chú..." rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Lưu</button>
+                  <button type="reset" class="btn btn-secondary">Xóa</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gifts Grid Section -->
+      <section class="gifts-section">
+        <div class="row">
+          <div class="col-12">
+            <h2 class="section-title">Danh sách của món quà</h2>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-container">
+          <div class="spinner"></div>
+          <p>Đang tải danh sách...</p>
+        </div>
+
+        <!-- Gifts Grid -->
+        <div id="giftsGrid" class="row g-4">
+          <!-- Gift cards will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <div class="row">
+            <div class="col-12 text-center">
+              <p class="empty-message">Danh sách trống. Hãy thêm những món quà mới nhé! 💝</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Custom JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>
