@@ -67,61 +67,61 @@ async function loadAndDisplayGifts() {
   }
 }
 
-// ==========================================
-// FETCH GIFTS FROM GOOGLE SHEETS
-// ==========================================
+// // ==========================================
+// // FETCH GIFTS FROM GOOGLE SHEETS
+// // ==========================================
 
-async function fetchGiftsFromSheet() {
-  try {
-    console.log("Fetching gifts from:", SCRIPT_URL + "?action=read");
-    
-    const response = await fetch(SCRIPT_URL + "?action=read", {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+// async function fetchGiftsFromSheet() {
+//   try {
+//     console.log("Fetching gifts from:", SCRIPT_URL + "?action=read");
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+//     // Thử fetch đơn giản hơn
+//     const response = await fetch(SCRIPT_URL + "?action=read");
 
-    const result = await response.json();
-    console.log("Fetched data:", result);
+//     console.log("Response status:", response.status);
+//     console.log("Response headers:", response.headers);
 
-    // Transform server response to match our expected format
-    // Expected format: array of objects with { ten, link, ghichu, status }
-    if (result.data && Array.isArray(result.data)) {
-      return result.data.map(item => ({
-        ten: item.ten || item["Tên"] || "",
-        link: item.link || item["Link"] || "",
-        ghichu: item.ghichu || item["Ghi chú"] || "",
-        status: item.status || item["Status"] || ""
-      }));
-    }
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       console.error("Response error:", errorText);
+//       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+//     }
 
-    console.warn("Expected data format not found in response");
-    return [];
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    console.log("Hint: Make sure Google Apps Script is deployed with 'Execute as: Me' and 'Who has access: Anyone'");
-    return [];
-  }
-}
+//     const result = await response.json();
+//     console.log("Fetched data:", result);
 
-// ==========================================
-// DISPLAY GIFTS IN GRID
-// ==========================================
+//     // Transform server response to match our expected format
+//     // Expected format: array of objects with { ten, link, ghichu, status }
+//     if (result.data && Array.isArray(result.data)) {
+//       return result.data.map(item => ({
+//         ten: item.ten || item["Tên"] || "",
+//         link: item.link || item["Link"] || "",
+//         ghichu: item.ghichu || item["Ghi chú"] || "",
+//         status: item.status || item["Status"] || ""
+//       }));
+//     }
 
-function displayGifts(gifts) {
-  giftsGrid.innerHTML = "";
+//     console.warn("Expected data format not found in response");
+//     return [];
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     console.log("Hint: Make sure Google Apps Script is deployed with 'Execute as: Me' and 'Who has access: Anyone'");
+//     return [];
+//   }
+// }
 
-  gifts.forEach((gift, index) => {
-    const giftCard = createGiftCard(gift, index);
-    giftsGrid.appendChild(giftCard);
-  });
-}
+// // ==========================================
+// // DISPLAY GIFTS IN GRID
+// // ==========================================
+
+// function displayGifts(gifts) {
+//   giftsGrid.innerHTML = "";
+
+//   gifts.forEach((gift, index) => {
+//     const giftCard = createGiftCard(gift, index);
+//     giftsGrid.appendChild(giftCard);
+//   });
+// }
 
 // ==========================================
 // CREATE GIFT CARD ELEMENT
@@ -253,7 +253,7 @@ async function handleFormSubmit(e) {
       giftForm.reset();
 
       // Reload and display gifts
-      await loadAndDisplayGifts();
+      // await loadAndDisplayGifts();
     } else {
       throw new Error(result.message || "Unknown error");
     }
