@@ -1,0 +1,40 @@
+/* ==========================================
+   PASTEL PINK WISHLIST - MAIN STYLES
+   ========================================== */
+
+/* Color Palette / CSS Variables */
+:root {
+  /* Primary Pastel Pink Palette */
+  --primary-pink: #FFB6D9;
+  --primary-pink-light: #FFC0CB;
+  --primary-pink-lighter: #FFD4E5;
+  --primary-pink-darkish: #FF99BB;
+  
+  /* Secondary Colors */
+  --white: #FFFFFF;
+  --off-white: #F9F6FB;
+  --light-gray: #F5F3F7;
+  --gray-text: #6B5B7F;
+  --soft-shadow: rgba(255, 150, 187, 0.15);
+  
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --heading-font-weight: 600;
+  --body-font-weight: 400;
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  /* Border Radius */
+  --border-radius-sm: 0.75rem;
+  --border-radius-md: 1rem;
+  --border-radius-lg: 1.5rem;
+  
+  /* Transitions */
+  --transition-speed: 0.3s;
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}

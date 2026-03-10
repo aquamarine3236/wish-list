@@ -1,0 +1,15 @@
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+.min-vh-section {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.required {
+  color: #E85D75;
+  margin-left: 0.25rem;
+}

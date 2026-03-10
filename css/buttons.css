@@ -1,0 +1,99 @@
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+.btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-smooth);
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary {
+  background-color: var(--primary-pink-darkish);
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(255, 150, 187, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: #e8849f;
+  box-shadow: 0 6px 16px rgba(255, 150, 187, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Keep pink color when disabled — overrides Bootstrap's blue/gray default */
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--primary-pink-darkish);
+  color: var(--white);
+  opacity: 0.7;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 150, 187, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--light-gray);
+  color: var(--gray-text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-pink-lighter);
+  color: var(--primary-pink-darkish);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: var(--border-radius-sm);
+  flex: 1;
+  text-align: center;
+}
+
+.btn-delete {
+  background-color: #FFE5ED;
+  color: #E85D75;
+}
+
+.btn-delete:hover {
+  background-color: #FFD4E5;
+  color: #D63E5C;
+}
+
+.btn-reload {
+  background-color: var(--white);
+  color: var(--primary-pink-darkish);
+  border: 2px solid var(--primary-pink-lighter);
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-smooth);
+}
+
+.btn-reload:hover {
+  background-color: var(--primary-pink-lighter);
+  border-color: var(--primary-pink);
+  transform: translateY(-1px);
+}
+
+.btn-reload:active {
+  transform: translateY(0);
+}
+
+.btn-reload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

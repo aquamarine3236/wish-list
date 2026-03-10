@@ -1,0 +1,215 @@
+/* ==========================================
+   RESPONSIVE TABLE — mobile card layout
+   ========================================== */
+
+@media (max-width: 900px) {
+  .table-section {
+    min-height: unset;
+    padding: var(--spacing-sm) 0;
+  }
+
+  .table-scroll-container {
+    max-height: none;
+    overflow-y: visible;
+    scrollbar-gutter: auto;
+  }
+
+  /* Hide the header row on mobile — labels are shown inline */
+  .gifts-table thead {
+    display: none;
+  }
+
+  /* Each row becomes a card */
+  .gifts-table,
+  .gifts-table tbody,
+  .gifts-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  .gifts-table tr {
+    background: var(--white);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-sm);
+    border: 1px solid #F0E5EC;
+    box-shadow: 0 2px 8px var(--soft-shadow);
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .gifts-table tr:hover {
+    background-color: #FEF7FB;
+  }
+
+  /* Each cell is a two-column row: label | value */
+  .gifts-table td {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    border-right: none;
+    border-bottom: 1px solid #F0E5EC;
+    font-size: 0.92rem;
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .gifts-table td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label column — styled like the pink table header */
+  .gifts-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--white);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #FFB6D9 0%, #FFC0CB 100%);
+    min-width: 90px;
+    width: 90px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+    border-right: 2px solid rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    line-height: 1.3;
+    align-self: stretch;
+    box-sizing: border-box;
+  }
+
+  /* Value column gets its own padding */
+  .gifts-table td.cell-name,
+  .gifts-table td.cell-link,
+  .gifts-table td.cell-note,
+  .gifts-table td.cell-actions {
+    padding: 0;
+  }
+
+  .gifts-table .cell-value {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+  }
+
+  /* Actions cell: empty pink label column, button aligned left in value area */
+  .gifts-table td.cell-actions::before {
+    content: "";
+    background: linear-gradient(135deg, #FFB6D9 0%, #FFC0CB 100%);
+  }
+
+  .gifts-table td.cell-actions {
+    justify-content: flex-start;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .gifts-table td.cell-actions .cell-value {
+    padding: 0.4rem 0.75rem;
+    flex: 1;
+  }
+
+  .table-reload-bar {
+    justify-content: center;
+  }
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+/* Tablets (768px and up) */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.4rem;
+  }
+
+  .form-card {
+    padding: var(--spacing-md);
+  }
+
+  .gift-card {
+    padding: var(--spacing-md);
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+/* Mobile (576px and down) */
+@media (max-width: 576px) {
+  :root {
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .main-content {
+    padding: var(--spacing-lg) 0;
+  }
+
+  .form-section,
+  .gifts-section {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .form-title {
+    font-size: 1.25rem;
+  }
+
+  .gift-card {
+    padding: var(--spacing-md);
+  }
+
+  .gift-name {
+    font-size: 1.1rem;
+  }
+
+  .gift-link a {
+    font-size: 0.85rem;
+    word-break: break-word;
+  }
+
+  .hero-section {
+    padding: var(--spacing-lg) 0;
+  }
+
+  .min-vh-section {
+    min-height: 40vh;
+  }
+}
