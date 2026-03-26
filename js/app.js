@@ -15,6 +15,74 @@ const giftTabs = document.getElementById("giftTabs");
 let tableDataLoaded = false;
 
 // ==========================================
+// LINK LIST HELPERS
+// ==========================================
+
+function createLinkRow(value) {
+  const row = document.createElement("div");
+  row.className = "link-input-row";
+  const input = document.createElement("input");
+  input.type = "url";
+  input.className = "form-control";
+  input.placeholder = "https://example.com";
+  input.value = value || "";
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "btn-link-remove";
+  removeBtn.title = "Xóa";
+  removeBtn.textContent = "×";
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  return row;
+}
+
+function setupLinkList(listId, addBtnId) {
+  const list = document.getElementById(listId);
+  const addBtn = document.getElementById(addBtnId);
+
+  addBtn.addEventListener("click", () => {
+    list.appendChild(createLinkRow(""));
+  });
+
+  list.addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-link-remove")) {
+      const rows = list.querySelectorAll(".link-input-row");
+      if (rows.length > 1) {
+        e.target.closest(".link-input-row").remove();
+      } else {
+        // Last row — just clear the value
+        rows[0].querySelector("input").value = "";
+      }
+    }
+  });
+}
+
+function collectLinks(listId) {
+  const inputs = document.querySelectorAll(`#${listId} .link-input-row input`);
+  return Array.from(inputs)
+    .map(input => input.value.trim())
+    .filter(v => v !== "")
+    .join("\n");
+}
+
+function populateLinkList(listId, linksString) {
+  const list = document.getElementById(listId);
+  list.innerHTML = "";
+  const links = (linksString || "").split("\n").map(l => l.trim()).filter(l => l !== "");
+  if (links.length === 0) {
+    list.appendChild(createLinkRow(""));
+  } else {
+    links.forEach(link => list.appendChild(createLinkRow(link)));
+  }
+}
+
+function resetLinkList(listId) {
+  const list = document.getElementById(listId);
+  list.innerHTML = "";
+  list.appendChild(createLinkRow(""));
+}
+
+// ==========================================
 // INITIALIZATION
 // ==========================================
 
@@ -36,6 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Init star pickers
   initStarPicker("starPicker", "doMongMuon");
   initStarPicker("editStarPicker", "editDoMongMuon");
+
+  // Init link lists
+  setupLinkList("linkList", "addLinkBtn");
+  setupLinkList("editLinkList", "editAddLinkBtn");
 });
 
 // Initialize edit modal save button
@@ -56,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Handle edit modal save
   document.getElementById("saveEditBtn").addEventListener("click", async () => {
-    const newLink = document.getElementById("editLink").value.trim();
+    const newLink = collectLinks("editLinkList");
     const newNote = document.getElementById("editGhichu").value.trim();
     const newDoMongMuon = document.getElementById("editDoMongMuon").value;
     const giftName = window.currentEditingGift?.ten || "";
@@ -98,7 +170,7 @@ async function handleFormSubmit(e) {
 
   // Get form values
   const ten = document.getElementById("ten").value.trim();
-  const link = document.getElementById("link").value.trim();
+  const link = collectLinks("linkList");
   const ghichu = document.getElementById("ghichu").value.trim();
   const doMongMuon = document.getElementById("doMongMuon").value;
 
@@ -147,6 +219,7 @@ async function handleFormSubmit(e) {
       // Reset form first so fields are clear when dialog closes
       giftForm.reset();
       setStarPicker("starPicker", "doMongMuon", 0);
+      resetLinkList("linkList");
 
       await showAlertDialog(
         `Món quà "<strong>${ten}</strong>" đã được lưu thành công!`,

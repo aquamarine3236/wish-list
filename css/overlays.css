@@ -263,3 +263,27 @@
   padding: 0.4rem 0.75rem;
   font-size: 0.9rem;
 }
+
+/* ==========================================
+   TABLE CELL — multiple links
+   ========================================== */
+
+.cell-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cell-links-list a {
+  display: inline-block;
+  color: var(--primary-pink-darkish);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.cell-links-list a:hover {
+  color: #e8849f;
+  text-decoration: underline;
+}

@@ -59,8 +59,16 @@
                     </div>
 
                     <div class="form-group">
-                      <label for="link" class="form-label">Link tham khảo</label>
-                      <input type="url" class="form-control" id="link" name="link" placeholder="https://example.com">
+                      <div class="link-label-row">
+                        <label class="form-label">Link tham khảo</label>
+                        <button type="button" class="btn-link-add" id="addLinkBtn" title="Thêm link">+ Thêm</button>
+                      </div>
+                      <div class="link-list" id="linkList">
+                        <div class="link-input-row">
+                          <input type="url" class="form-control" placeholder="https://example.com">
+                          <button type="button" class="btn-link-remove" title="Xóa">×</button>
+                        </div>
+                      </div>
                     </div>
 
                     <div class="form-group">
@@ -159,8 +167,16 @@
               <input type="text" class="form-control" id="editTen" readonly>
             </div>
             <div class="mb-3">
-              <label for="editLink" class="form-label">Link tham khảo</label>
-              <input type="url" class="form-control" id="editLink" placeholder="https://example.com">
+              <div class="link-label-row">
+                <label class="form-label">Link tham khảo</label>
+                <button type="button" class="btn-link-add" id="editAddLinkBtn" title="Thêm link">+ Thêm</button>
+              </div>
+              <div class="link-list" id="editLinkList">
+                <div class="link-input-row">
+                  <input type="url" class="form-control" placeholder="https://example.com">
+                  <button type="button" class="btn-link-remove" title="Xóa">×</button>
+                </div>
+              </div>
             </div>
             <div class="mb-3">
               <label class="form-label">Độ mong muốn</label>

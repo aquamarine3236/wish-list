@@ -5,7 +5,7 @@
 function openEditModal(gift) {
   // Populate modal with current data
   document.getElementById("editTen").value = gift.ten;
-  document.getElementById("editLink").value = gift.link || "";
+  populateLinkList("editLinkList", gift.link || "");
   document.getElementById("editGhichu").value = gift.ghichu || "";
 
   // Populate star picker

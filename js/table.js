@@ -88,14 +88,20 @@ function createTableRow(gift, index) {
   const linkCell = document.createElement("td");
   linkCell.className = "cell-link";
   linkCell.dataset.label = "Link";
-  if (gift.link && gift.link.trim()) {
-    const link = document.createElement("a");
-    link.href = normalizeUrl(gift.link);
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = "Link";
-    link.title = gift.link;
-    linkCell.appendChild(valueSpan(link));
+  const rawLinks = (gift.link || "").split("\n").map(l => l.trim()).filter(l => l !== "");
+  if (rawLinks.length > 0) {
+    const linksContainer = document.createElement("div");
+    linksContainer.className = "cell-links-list";
+    rawLinks.forEach((url, i) => {
+      const a = document.createElement("a");
+      a.href = normalizeUrl(url);
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = rawLinks.length === 1 ? "Link" : `Link ${i + 1}`;
+      a.title = url;
+      linksContainer.appendChild(a);
+    });
+    linkCell.appendChild(valueSpan(linksContainer));
   } else {
     linkCell.appendChild(valueSpan("—"));
   }

@@ -143,3 +143,89 @@
   color: var(--primary-pink-darkish);
   transform: scale(1.15);
 }
+
+/* ==========================================
+   LINK LIST — dynamic add/remove links
+   ========================================== */
+
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.link-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.link-input-row .form-control {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-link-remove {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--primary-pink-lighter);
+  border-radius: var(--border-radius-sm);
+  background: var(--white);
+  color: #E85D75;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-smooth);
+  flex-shrink: 0;
+  line-height: 1;
+  padding: 0;
+}
+
+.link-list .link-input-row:only-child .btn-link-remove {
+  display: none;
+}
+
+.btn-link-remove:hover {
+  background-color: #FFE5ED;
+  border-color: #E85D75;
+  transform: scale(1.1);
+}
+
+.link-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.link-label-row .form-label {
+  margin-bottom: 0;
+}
+
+.btn-link-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: linear-gradient(135deg, var(--primary-pink-lighter) 0%, var(--primary-pink-light) 100%);
+  border: none;
+  border-radius: 2rem;
+  color: var(--primary-pink-darkish);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-smooth);
+  letter-spacing: 0.2px;
+}
+
+.btn-link-add:hover {
+  background: linear-gradient(135deg, var(--primary-pink-light) 0%, var(--primary-pink) 100%);
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(255, 150, 187, 0.35);
+}
